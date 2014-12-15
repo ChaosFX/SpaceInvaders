@@ -16,6 +16,10 @@ Preload.prototype = {
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('invader0', 'assets/invader_00.png');
     this.load.image('invader1', 'assets/invader_01.png');
+    this.load.image('invader2', 'assets/invader_02.png');
+    this.load.image('bomb0', 'assets/bomb_00.png');
+    this.load.image('bomb1', 'assets/bomb_01.png');
+    this.load.image('bomb2', 'assets/bomb_02.png');
 
     this.load.spritesheet('explosion', 'assets/explosion.png', 128, 128);
 
@@ -25,7 +29,7 @@ Preload.prototype = {
     this.load.audio('introMusic', 'assets/Interstellar8bit.mp3');
     this.load.audio('music', 'assets/spaceinvaders1.mp3');
 
-    this.load.bitmapFont('flappyfont', 'assets/flappyfont.png', 'assets/flappyfont.fnt');
+    this.load.bitmapFont('font', 'assets/pixelBitmap.png', 'assets/pixelBitmap.fnt');
 
   },
   create: function() {

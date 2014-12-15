@@ -24,13 +24,14 @@
 
       this.music = this.game.add.sound('introMusic').play();
 
-      for (var i = 0; i < this.introText.length; i++) {
-        this.game.time.events.add(Phaser.Timer.SECOND * 6 , function () {
-          this.introLabel.setText(this.introText[i]);
-        }, this).autoDestroy = true;
-      }
+      var index = -1;
 
-      this.game.time.events.add(Phaser.Timer.SECOND * 89, function () {
+      this.game.time.events.repeat(Phaser.Timer.SECOND * 6, 12, function () {
+        index++;
+        this.introLabel.setText(this.introText[index]);
+      }, this);
+
+      this.game.time.events.add(Phaser.Timer.SECOND * 78, function () {
         this.game.state.start('play');
       }, this).autoDestroy = true;
     },

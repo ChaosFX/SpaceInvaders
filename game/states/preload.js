@@ -12,6 +12,7 @@ Preload.prototype = {
 
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
+
     this.load.image('player', 'assets/player.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('invader0', 'assets/invader_00.png');
@@ -37,7 +38,7 @@ Preload.prototype = {
   },
   update: function() {
     if(!!this.ready) {
-      this.game.state.start('play');
+      this.game.state.start('intro');
     }
   },
   onLoadComplete: function() {

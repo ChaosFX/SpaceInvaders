@@ -20,7 +20,7 @@
         ''
       ];
 
-      this.introLabel = this.game.add.text(100, 100, '', { font: '24px Arial', fill: '#ffffff' });
+      this.introLabel = this.game.add.bitmapText(100, 100, 'font', '');
 
       this.music = this.game.add.sound('introMusic').play();
 
@@ -31,9 +31,16 @@
         this.introLabel.setText(this.introText[index]);
       }, this);
 
-      this.game.time.events.add(Phaser.Timer.SECOND * 78, function () {
+      this.game.time.events.add(Phaser.Timer.SECOND * 86, function () {
         this.game.state.start('play');
       }, this).autoDestroy = true;
+
+      this.skipText = this.game.add.bitmapText(this.game.width / 2 - 50, this.game.height - 20, 'font', '[Press ESC to skip]', 10);
+      this.game.input.keyboard.addKeyCapture(Phaser.Keyboard.ESC);
+      this.skipKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+      this.skipKey.onDown.addOnce(function () {
+        this.game.state.start('play');
+      }, this);
     },
 
     update: function () {
@@ -51,6 +58,8 @@
     shutdown: function () {
       this.music.destroy();
       this.introLabel.destroy();
+      this.skipText.destroy();
+      this.game.input.keyboard.removeKey(Phaser.Keyboard.ESC);
     }
   };
 module.exports = Intro;

@@ -65,12 +65,15 @@ Play.prototype = {
 
     this.game.add.sound('music', 1, true).play();
 
+    this.livesText = this.game.add.bitmapText(20, this.game.height - 30, 'font', 'Lives: ');
+    this.setupLives();
+
     this.game.time.advancedTiming = true;
     // this.fpsText = this.game.add.text(20, 20, '', { font: '16px Arial', fill: '#ffffff' });
 
     this.scoreText = this.game.add.bitmapText(20, 10, 'font', 'Score: ' + this.vscore);
     this.highScoreText = this.game.add.bitmapText(this.game.width / 2, 10, 'font', 'Highscore: ' + this.highscore);
-    this.livesText = this.game.add.bitmapText(20, this.game.height - 30, 'font', 'Lives: ' + this.lives);
+
 
   },
 
@@ -130,8 +133,21 @@ Play.prototype = {
     }
   },
 
+  setupLives: function () {
+
+    this.livesGroup = this.game.add.group();
+    for (var i = 0; i < this.lives; i++) {
+      var x = (this.livesText.width + 50) + (40 * i);
+      var y = this.livesText.y - 10;
+      this.livesGroup.create(x, y, 'player');
+    }
+
+  },
+
   checkLives: function () {
-    this.livesText.setText('Lives: ' + this.lives);
+    this.livesText.setText('Lives: ');
+    var live = this.livesGroup.getAt(this.lives);
+    live.kill();
   },
 
   checkScore: function () {
@@ -154,8 +170,8 @@ Play.prototype = {
     this.lives = 3;
     this.score = 0;
     this.vscore = 0;
-    this.checkScore();
-    this.checkLives();
+    this.setupLives();
+    // this.checkLives();
     this.respawnPlayer();
     this.nextWave();
   },
@@ -216,6 +232,7 @@ Play.prototype = {
 
   gameOver: function () {
   	this.player.kill();
+    this.livesGroup.destroy();
     this.invaders.destroy();
     this.getSetHighScore();
     this.bulletGroup.callAll('kill');

@@ -80,10 +80,10 @@ module.exports = GameOver;
         'that do not at presant',
         'or may never exist.',
         'That is near insanity.',
-        'Do not misunderstand me',
+        'Do not missunderstand me',
         'the danger is very real',
         'the fear is a choice.',
-        ''
+        'Are you ready to save the world?'
       ];
 
       this.introLabel = this.game.add.bitmapText(100, 100, 'font', '');
@@ -92,7 +92,7 @@ module.exports = GameOver;
 
       var index = -1;
 
-      this.game.time.events.repeat(Phaser.Timer.SECOND * 6, 12, function () {
+      this.game.time.events.repeat(Phaser.Timer.SECOND * 6, this.introText.length, function () {
         index++;
         this.introLabel.setText(this.introText[index]);
       }, this);
@@ -136,27 +136,109 @@ module.exports = Intro;
 function Menu() {}
 
 Menu.prototype = {
-  preload: function() {
+  preload: function () {
 
   },
-  create: function() {
-    var style = { font: '65px Arial', fill: '#ffffff', align: 'center'};
-    this.sprite = this.game.add.sprite(this.game.world.centerX, 138, 'yeoman');
-    this.sprite.anchor.setTo(0.5, 0.5);
 
-    this.titleText = this.game.add.text(this.game.world.centerX, 300, '\'Allo, \'Allo!', style);
-    this.titleText.anchor.setTo(0.5, 0.5);
+  create: function () {
 
-    this.instructionsText = this.game.add.text(this.game.world.centerX, 400, 'Click anywhere to play "Click The Yeoman Logo"', { font: '16px Arial', fill: '#ffffff', align: 'center'});
-    this.instructionsText.anchor.setTo(0.5, 0.5);
+    this.buttons = {
+      pos: [-50, 50, 150],
+      callbacks: [this.playState, this.howtoState, this.creditState]
+    };
 
-    this.sprite.angle = -20;
-    this.game.add.tween(this.sprite).to({angle: 20}, 1000, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+    this.cursors = this.game.input.keyboard.createCursorKeys();
+
+    this.button1 = this.game.add.button(this.game.world.centerX, this.game.world.centerY - 50, 'menuPlayButton', this.playState, this);
+    this.button1.anchor.setTo(0.5, 0.5);
+
+    this.button2 = this.game.add.button(this.game.world.centerX, this.game.world.centerY + 50, 'menuHowtoButton', this.howtoState, this);
+    this.button2.anchor.setTo(0.5, 0.5);
+
+    this.button3 = this.game.add.button(this.game.world.centerX, this.game.world.centerY + 150, 'menuCreditButton', this.creditState, this);
+    this.button3.anchor.setTo(0.5, 0.5);
+
+    this.arrow = this.game.add.image(this.game.world.centerX - 100, this.game.world.centerY - 50, 'menuArrow');
+    this.arrow.anchor.setTo(0.5, 0.5);
+    this.arrow.moveDelay = 100;
+    this.arrow.canMove = true;
+    this.arrow.currentButton = 1;
+
+    this.game.add.tween(this.arrow)
+    .to({
+      x: this.arrow.x - 10
+    }, 700, Phaser.Easing.Quadratic.Out)
+    .to({
+      x: this.arrow.x
+    }, 400, Phaser.Easing.Quadratic.In)
+    .loop().start();
   },
-  update: function() {
-    if(this.game.input.activePointer.justPressed()) {
-      this.game.state.start('play');
+
+  playState: function () {
+    this.game.state.start('intro');
+  },
+
+  howtoState: function () {
+
+  },
+
+  creditState: function () {
+
+  },
+
+  move: function () {
+    if (this.cursors.down.isDown && this.arrow.canMove) {
+      this.arrow.canMove = false;
+      this.allowMovement();
+
+      if (this.arrow.currentButton === 1) {
+        this.tween(2);
+      } else if (this.arrow.currentButton === 2) {
+        this.tween(3);
+      } else {
+        this.tween(1);
+      }
     }
+
+    if (this.cursors.up.isDown && this.arrow.canMove) {
+      this.arrow.canMove = false;
+      this.allowMovement();
+
+      if (this.arrow.currentButton === 1) {
+        this.tween(3);
+      } else if (this.arrow.currentButton === 2) {
+        this.tween(1);
+      } else {
+        this.tween(2);
+      }
+    }
+
+    if (this.game.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
+      this.activateButton(this.arrow.currentButton);
+    }
+  },
+
+  tween: function (buttonNum) {
+    this.game.add.tween(this.arrow)
+    .to({
+      y: this.game.world.centerY + this.buttons.pos[buttonNum - 1]
+    }, this.arrow.delay, Phaser.Easing.Quadratic.In)
+    .start();
+    this.arrow.currentButton = buttonNum;
+  },
+
+  allowMovement: function () {
+    this.game.time.events.add(255, function () {
+      this.arrow.canMove = true;
+    }, this);
+  },
+
+  activateButton: function (currentButton) {
+    this.buttons.callbacks[currentButton - 1].call(this);
+  },
+
+  update: function () {
+    this.move();
   }
 };
 
@@ -230,12 +312,15 @@ Play.prototype = {
 
     this.game.add.sound('music', 1, true).play();
 
+    this.livesText = this.game.add.bitmapText(20, this.game.height - 30, 'font', 'Lives: ');
+    this.setupLives();
+
     this.game.time.advancedTiming = true;
     // this.fpsText = this.game.add.text(20, 20, '', { font: '16px Arial', fill: '#ffffff' });
 
     this.scoreText = this.game.add.bitmapText(20, 10, 'font', 'Score: ' + this.vscore);
     this.highScoreText = this.game.add.bitmapText(this.game.width / 2, 10, 'font', 'Highscore: ' + this.highscore);
-    this.livesText = this.game.add.bitmapText(20, this.game.height - 30, 'font', 'Lives: ' + this.lives);
+
 
   },
 
@@ -295,8 +380,21 @@ Play.prototype = {
     }
   },
 
+  setupLives: function () {
+
+    this.livesGroup = this.game.add.group();
+    for (var i = 0; i < this.lives; i++) {
+      var x = (this.livesText.width + 50) + (40 * i);
+      var y = this.livesText.y - 10;
+      this.livesGroup.create(x, y, 'player');
+    }
+
+  },
+
   checkLives: function () {
-    this.livesText.setText('Lives: ' + this.lives);
+    this.livesText.setText('Lives: ');
+    var live = this.livesGroup.getAt(this.lives);
+    live.kill();
   },
 
   checkScore: function () {
@@ -319,8 +417,8 @@ Play.prototype = {
     this.lives = 3;
     this.score = 0;
     this.vscore = 0;
-    this.checkScore();
-    this.checkLives();
+    this.setupLives();
+    // this.checkLives();
     this.respawnPlayer();
     this.nextWave();
   },
@@ -381,6 +479,7 @@ Play.prototype = {
 
   gameOver: function () {
   	this.player.kill();
+    this.livesGroup.destroy();
     this.invaders.destroy();
     this.getSetHighScore();
     this.bulletGroup.callAll('kill');
@@ -489,6 +588,11 @@ Preload.prototype = {
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
 
+    this.load.image('menuArrow', 'assets/menu_arrow.png');
+    this.load.image('menuPlayButton', 'assets/menu_play_button.png');
+    this.load.image('menuCreditButton', 'assets/menu_credits_button.png');
+    this.load.image('menuHowtoButton', 'assets/menu_howto_button.png');
+
     this.load.image('player', 'assets/player.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('invader0', 'assets/invader_00.png');
@@ -514,7 +618,7 @@ Preload.prototype = {
   },
   update: function() {
     if(!!this.ready) {
-      this.game.state.start('intro');
+      this.game.state.start('menu');
     }
   },
   onLoadComplete: function() {

@@ -14,10 +14,10 @@
         'that do not at presant',
         'or may never exist.',
         'That is near insanity.',
-        'Do not misunderstand me',
+        'Do not missunderstand me',
         'the danger is very real',
         'the fear is a choice.',
-        ''
+        'Are you ready to save the world?'
       ];
 
       this.introLabel = this.game.add.bitmapText(100, 100, 'font', '');
@@ -26,7 +26,7 @@
 
       var index = -1;
 
-      this.game.time.events.repeat(Phaser.Timer.SECOND * 6, 12, function () {
+      this.game.time.events.repeat(Phaser.Timer.SECOND * 6, this.introText.length, function () {
         index++;
         this.introLabel.setText(this.introText[index]);
       }, this);
